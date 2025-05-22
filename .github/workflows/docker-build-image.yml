@@ -36,7 +36,7 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/x86_64
-          tags: ghcr.io/roid-nexus_x86:latest
+          tags: ghcr.io/${{ github.repository_owner }}/roid-nexus_x86:latest
           build-args: |
             ARCH=x86_64
             TARGET=google_apis_playstore
