@@ -23,17 +23,17 @@ Down below is the list of the main scripts to launch the relevant service, certa
     OR for customized image
 
         docker build \
-        --build-arg ARCH=x86_64  \
-        --build-arg TARGET=google_apis_playstore\
-        --build-arg API_LEVEL=31 \
-        --build-arg BUILD_TOOLS=31.0.0 \
-        --build-arg EMULATOR_DEVICE="Nexus 6" \
-        --build-arg EMULATOR_NAME=nexus \
-        -t my-android-image .  
+            --build-arg ARCH=x86_64  \
+            --build-arg TARGET=google_apis_playstore \
+            --build-arg API_LEVEL=31 \
+            --build-arg BUILD_TOOLS=31.0.0 \
+            --build-arg EMULATOR_DEVICE="Nexus 6" \
+            --build-arg EMULATOR_NAME=nexus \
+            -t android-emulator .
     
 2.  **Start your container:**
 
-        docker run -it --privileged -d -p 5900:5900 --name androidContainer --privileged android-emulator  
+        docker run -it --privileged -d -p 5900:5900 -p 6080:6080 -p 4723:4723 --name androidContainer --privileged android-emulator
 
 3.  **Launch the appium session :**
 
