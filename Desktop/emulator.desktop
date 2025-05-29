@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Android Emulator (ARM)
+Comment=Android 9.0 Pixel 3a Emulator
+GenericName=Emulator
+Keywords=Android;app;apk;arm;pixel
+Exec=emulator64-arm -avd pixel
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true

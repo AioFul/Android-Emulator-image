@@ -38,12 +38,12 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/x86_64
-          tags: ghcr.io/${{ env.GHCR_OWNER }}/roid-nexus_x86:latest
+          platforms: linux/amd64, linux/x86_64
+          tags: ghcr.io/${{ env.GHCR_OWNER }}/roid-pixel:api28
           build-args: |
             ARCH=x86_64
-            TARGET=google_apis_playstore
-            API_LEVEL=31
-            BUILD_TOOLS=31.0.0
-            EMULATOR_DEVICE=Nexus 6
-            EMULATOR_NAME=nexus
+            TARGET=google_apis
+            API_LEVEL=28
+            BUILD_TOOLS=28.0.3
+            EMULATOR_DEVICE=pixel_3a
+            EMULATOR_NAME=pixel
