@@ -8,20 +8,39 @@ NC='\033[0m' # No Color
 
 emulator_name=${EMULATOR_NAME}
 
+# 以下5个参数已在Dockerfile中设置默认值，无需在此重复赋值
+EMULATOR_NAME=${EMULATOR_NAME}
+EMULATOR_DEVICE=${EMULATOR_DEVICE}
+ARCH=${ARCH}
+API_LEVEL=${API_LEVEL}
+EMU_MEMORY=${EMULATOR_MEMORY}
+
+EMU_SKIN=${EMULATOR_SKIN:-480x800}
+EMU_DPI=${EMULATOR_DPI:-120}
+EMU_SMP=${EMULATOR_SMP:-1}
+EMU_NOAUDIO=${EMULATOR_NOAUDIO:-"-noaudio"}
+EMU_NOCACHE=${EMULATOR_NOCACHE:-"-nocache"}
+EMU_NO_SNAPSHOT=${EMULATOR_NO_SNAPSHOT:-""}
+EMU_NO_WINDOW=${EMULATOR_NO_WINDOW:--no-window}
+EMU_CAMERA_BACK=${EMULATOR_CAMERA_BACK:-"-camera-back none"}
+EMU_CAMERA_FRONT=${EMULATOR_CAMERA_FRONT:-"-camera-front none"}
+EMU_GPU=${EMULATOR_GPU:-"-gpu swiftshader_indirect"}
+EMU_ACCEL=${EMULATOR_ACCEL:-"-accel off"}
+EMU_LOW_RAM=${EMULATOR_LOW_RAM:--lowram}
+EMU_NO_METRICS=${EMULATOR_NO_METRICS:--no-metrics}
+
 function check_hardware_acceleration() {
     if [[ "$HW_ACCEL_OVERRIDE" != "" ]]; then
         hw_accel_flag="$HW_ACCEL_OVERRIDE"
     else
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS-specific hardware acceleration check
             HW_ACCEL_SUPPORT=$(sysctl -a | grep -E -c '(vmx|svm)')
         else
-            # generic Linux hardware acceleration check
             HW_ACCEL_SUPPORT=$(grep -E -c '(vmx|svm)' /proc/cpuinfo)
         fi
 
         if [[ $HW_ACCEL_SUPPORT == 0 ]]; then
-            hw_accel_flag="-accel off"
+            hw_accel_flag="-accel off
         else
             hw_accel_flag="-accel on"
         fi
@@ -30,15 +49,14 @@ function check_hardware_acceleration() {
     echo "$hw_accel_flag"
 }
 
-
 hw_accel_flag=$(check_hardware_acceleration)
 
 function launch_emulator () {
   adb devices | grep emulator | cut -f1 | xargs -I {} adb -s "{}" emu kill
-  options="@${emulator_name} -no-window -no-snapshot -noaudio -no-boot-anim -memory 2048 ${hw_accel_flag} -camera-back none"
+  options="@${emulator_name} ${EMU_NO_WINDOW} -no-boot-anim -memory ${EMU_MEMORY} -skin ${EMU_SKIN} -dpi-device ${EMU_DPI} -cores ${EMU_SMP} ${hw_accel_flag} ${EMU_GPU} ${EMU_NOAUDIO} ${EMU_NOCACHE} ${EMU_NO_SNAPSHOT} ${EMU_CAMERA_BACK} ${EMU_CAMERA_FRONT} ${EMU_LOW_RAM} ${EMU_NO_METRICS}"
   if [[ "$OSTYPE" == *linux* ]]; then
-    echo "${OSTYPE}: emulator ${options} -gpu off"
-    nohup emulator $options -gpu off &
+    echo "${OSTYPE}: emulator ${options}"
+    nohup emulator $options &
   fi
   if [[ "$OSTYPE" == *darwin* ]] || [[ "$OSTYPE" == *macos* ]]; then
     echo "${OSTYPE}: emulator ${options} -gpu swiftshader_indirect"
@@ -51,13 +69,11 @@ function launch_emulator () {
   fi
 }
 
-
 function check_emulator_status () {
   printf "${G}==> ${BL}Checking emulator booting up status 🧐${NC}\n"
   start_time=$(date +%s)
   spinner=( "⠹" "⠺" "⠼" "⠶" "⠦" "⠧" "⠇" "⠏" )
   i=0
-  # Get the timeout value from the environment variable or use the default value of 300 seconds (5 minutes)
   timeout=${EMULATOR_TIMEOUT:-300}
 
   while true; do
@@ -84,7 +100,6 @@ function check_emulator_status () {
     sleep 4
   done
 };
-
 
 function disable_animation() {
   adb shell "settings put global window_animation_scale 0.0"

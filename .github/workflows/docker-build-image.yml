@@ -38,12 +38,13 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64, linux/x86_64
+          platforms: linux/amd64, linux/arm64
           tags: ghcr.io/${{ env.GHCR_OWNER }}/roid-pixel:api28
           build-args: |
-            ARCH=x86_64
+            ARCH=x86
             TARGET=google_apis
             API_LEVEL=28
             BUILD_TOOLS=28.0.3
             EMULATOR_DEVICE=pixel_3a
             EMULATOR_NAME=pixel
+          # 如需覆盖参数，可在此处添加其它build-args

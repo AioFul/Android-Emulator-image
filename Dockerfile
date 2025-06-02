@@ -12,7 +12,7 @@
 # 常用构建参数（docker build --build-arg）：
 #   API_LEVEL          Android API级别，默认28 (Android 9.0)
 #   BUILD_TOOLS        Build-tools版本，默认28.0.3
-#   ARCH               cpu架构，默认arm64-v8a
+#   ARCH               cpu架构，默认x86
 #   TARGET             system image类型，默认google_apis, 可选google_apis_playstore
 #   EMULATOR_NAME      AVD名字，默认pixel
 #   EMULATOR_DEVICE    设备名，默认pixel_3a
@@ -35,8 +35,7 @@ RUN apt-get update && \
       libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libnss3 \
       libxcursor1 libpulse-dev libxshmfence-dev \
       xauth xvfb x11vnc fluxbox wmctrl libdbus-glib-1-2 \
-      python3 python3-pip \
-      qemu qemu-user qemu-system-arm libvirt-daemon
+      python3 python3-pip
 
 # ---- 安装 noVNC ----
 RUN mkdir -p /opt/novnc
@@ -50,10 +49,10 @@ RUN wget -qO- https://github.com/novnc/websockify/archive/refs/tags/v0.13.0.tar.
     mv /opt/novnc/utils/websockify-0.13.0 /opt/novnc/utils/websockify
 
 # ---- Android SDK环境变量与构建参数 ----
-ARG ARCH="arm64-v8a"
-ARG TARGET="google_apis"
-ARG API_LEVEL="28"
-ARG BUILD_TOOLS="28.0.3"
+ARG ARCH="x86"                # 默认x86架构，可通过--build-arg覆盖
+ARG TARGET="google_apis"         # 默认google_apis，可通过--build-arg覆盖
+ARG API_LEVEL="28"               # 默认API 28(Android 9)，可通过--build-arg覆盖
+ARG BUILD_TOOLS="28.0.3"         # 默认build-tools 28.0.3，可通过--build-arg覆盖
 ARG ANDROID_API_LEVEL="android-${API_LEVEL}"
 ARG ANDROID_APIS="${TARGET};${ARCH}"
 ARG EMULATOR_PACKAGE="system-images;${ANDROID_API_LEVEL};${ANDROID_APIS}"
@@ -78,8 +77,8 @@ RUN yes Y | sdkmanager --licenses
 RUN yes Y | sdkmanager --verbose --no_https ${ANDROID_SDK_PACKAGES}
 
 # ---- 创建AVD修改 ----
-ARG EMULATOR_NAME="pixel"
-ARG EMULATOR_DEVICE="pixel_3a"
+ARG EMULATOR_NAME="pixel"        # 默认设备名pixel，可通过--build-arg覆盖
+ARG EMULATOR_DEVICE="pixel_3a"   # 默认设备型号pixel_3a，可通过--build-arg覆盖
 ENV EMULATOR_NAME=$EMULATOR_NAME
 ENV DEVICE_NAME=$EMULATOR_DEVICE
 RUN echo "no" | avdmanager --verbose create avd --force \
@@ -89,8 +88,8 @@ RUN echo "no" | avdmanager --verbose create avd --force \
     --abi "${ARCH}"
 
 # ---- 拷贝脚本 ----
-COPY . /
-RUN chmod a+x start_vnc.sh start_emu.sh start_appium.sh start_emu_headless.sh
+COPY scripts /scripts
+RUN chmod a+x /scripts/*.sh
 
 
 
@@ -112,8 +111,7 @@ RUN apt-get update && \
       curl sudo wget unzip bzip2 \
       libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libnss3 \
       libxcursor1 libpulse-dev libxshmfence-dev xauth xvfb x11vnc \
-      fluxbox wmctrl libdbus-glib-1-2 python3 python3-pip procps \
-      qemu qemu-user qemu-system-arm libvirt-daemon && \
+      fluxbox wmctrl libdbus-glib-1-2 python3 python3-pip procps  && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ---- 安装 Node.js, npm, Appium（此处为运行时环境所需） ----
@@ -141,11 +139,8 @@ COPY --from=builder /usr/bin/python3 /usr/bin/python3
 COPY --from=builder /usr/bin/pip3 /usr/bin/pip3
 
 # ---- 脚本 ----
-COPY --from=builder /start_vnc.sh /
-COPY --from=builder /start_emu.sh /
-COPY --from=builder /start_appium.sh /
-COPY --from=builder /start_emu_headless.sh /
-RUN chmod a+x /start_vnc.sh /start_emu.sh /start_appium.sh /start_emu_headless.sh
+COPY --from=builder /scripts /scripts
+RUN chmod a+x /scripts/*.sh
 
 # ---- 运行时可覆盖参数 ----
 ENV ANDROID_SDK_ROOT=/opt/android
@@ -155,12 +150,13 @@ ENV XVFB_RESOLUTION=1280x1024x24
 ENV XVFB_TIMEOUT=5
 ENV VNC_PASSWORD="abcd.1234"
 ENV DOCKER="true"
-ENV EMU=./start_emu.sh
-ENV EMU_HEADLESS=./start_emu_headless.sh
-ENV VNC=./start_vnc.sh
-ENV APPIUM=./start_appium.sh
+ENV EMU=/scripts/start_emu.sh
+ENV EMU_HEADLESS=/scripts/start_emu_headless.sh
+ENV VNC=/scripts/start_vnc.sh
+ENV APPIUM=/scripts/start_appium.sh
 ENV APPIUM_PORT=4723
 ENV EMULATOR_NAME=pixel
+ENV EMULATOR_MEMORY=1024
 
 # ---- 动态PATH，支持BUILD_TOOLS传递 ----
 ARG BUILD_TOOLS="28.0.3"
