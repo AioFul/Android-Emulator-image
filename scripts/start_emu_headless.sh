@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export ANDROID_EMULATOR_DISABLE_WARNING=1
+
 BL='\033[0;34m'
 G='\033[0;32m'
 RED='\033[0;31m'
@@ -26,8 +28,8 @@ EMU_CAMERA_BACK=${EMULATOR_CAMERA_BACK:-"-camera-back none"}
 EMU_CAMERA_FRONT=${EMULATOR_CAMERA_FRONT:-"-camera-front none"}
 EMU_GPU=${EMULATOR_GPU:-"-gpu swiftshader_indirect"}
 EMU_ACCEL=${EMULATOR_ACCEL:-"-accel off"}
-EMU_LOW_RAM=${EMULATOR_LOW_RAM:--lowram}
-EMU_NO_METRICS=${EMULATOR_NO_METRICS:--no-metrics}
+EMU_LOW_RAM=${EMULATOR_LOW_RAM:-"-lowram"}
+EMU_NO_METRICS=${EMULATOR_NO_METRICS:-"-no-metrics"}
 
 function check_hardware_acceleration() {
     if [[ "$HW_ACCEL_OVERRIDE" != "" ]]; then
@@ -53,7 +55,7 @@ hw_accel_flag=$(check_hardware_acceleration)
 
 function launch_emulator () {
   adb devices | grep emulator | cut -f1 | xargs -I {} adb -s "{}" emu kill
-  options="@${emulator_name} ${EMU_NO_WINDOW} -no-boot-anim -memory ${EMU_MEMORY} -skin ${EMU_SKIN} -dpi-device ${EMU_DPI} -cores ${EMU_SMP} ${hw_accel_flag} ${EMU_GPU} ${EMU_NOAUDIO} ${EMU_NOCACHE} ${EMU_NO_SNAPSHOT} ${EMU_CAMERA_BACK} ${EMU_CAMERA_FRONT} ${EMU_LOW_RAM} ${EMU_NO_METRICS}"
+  options="@${emulator_name} ${EMU_NO_WINDOW} -no-boot-anim -memory ${EMU_MEMORY} -skin ${EMU_SKIN} -cores ${EMU_SMP} ${hw_accel_flag} ${EMU_GPU} ${EMU_NOAUDIO} ${EMU_NOCACHE} ${EMU_NO_SNAPSHOT} ${EMU_CAMERA_BACK} ${EMU_CAMERA_FRONT} ${EMU_LOW_RAM} ${EMU_NO_METRICS}"
   if [[ "$OSTYPE" == *linux* ]]; then
     echo "${OSTYPE}: emulator ${options}"
     nohup emulator $options &

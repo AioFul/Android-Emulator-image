@@ -1,5 +1,6 @@
 #!/bin/bash
-export QT_QPA_PLATFORM=${QT_QPA_PLATFORM:-offscreen}
+# export QT_QPA_PLATFORM=${QT_QPA_PLATFORM:-offscreen}
+export ANDROID_EMULATOR_DISABLE_WARNING=1
 
 BL='\033[0;34m'
 G='\033[0;32m'
@@ -36,6 +37,7 @@ function wait_emulator_to_be_ready() {
     -skin ${EMU_SKIN}
     -cores ${EMU_SMP}
     -no-boot-anim
+    # -wipe-data
     ${EMU_GPU}
     ${EMU_NOAUDIO}
     ${EMU_NOCACHE}
@@ -45,7 +47,6 @@ function wait_emulator_to_be_ready() {
     ${EMU_NO_METRICS}
   )
   # 只在有值时追加参数
-  [ -n "${EMU_DPI}" ] && args+=(-dpi-device "${EMU_DPI}")
   [ -n "${EMU_NO_SNAPSHOT}" ] && args+=(${EMU_NO_SNAPSHOT})
   [ -n "${EMU_NO_WINDOW}" ] && args+=(${EMU_NO_WINDOW})
 
@@ -58,6 +59,8 @@ function disable_animation() {
   adb shell "settings put global window_animation_scale 0.0"
   adb shell "settings put global transition_animation_scale 0.0"
   adb shell "settings put global animator_duration_scale 0.0"
+  adb shell "settings put global anr_show_background 0"
+  adb shell "settings put global anr_timeout 60000"
 }
 
 wait_emulator_to_be_ready
