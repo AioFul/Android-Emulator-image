@@ -6,9 +6,9 @@ docker build \
     --build-arg TARGET="google_apis" \
     --build-arg API_LEVEL="25" \
     --build-arg BUILD_TOOLS="25.0.3" \
-    --build-arg EMULATOR_NAME="nexus" \
-    --build-arg EMULATOR_DEVICE="Nexus_5" \
-    -t android7-emulator-nexus:api25 .
+    --build-arg EMULATOR_NAME="pixel" \
+    --build-arg EMULATOR_DEVICE="pixel_3a" \
+    -t android7-emulator-pixel:api25 .
 
 # Build Android 7.1 ARM version
 docker build \
