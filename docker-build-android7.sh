@@ -11,14 +11,15 @@ docker build \
     -t android7-emulator-pixel:api25 .
 
 # Build Android 7.1 ARM version
+# --build-arg ARCH="arm64-v8a" \
 docker build \
-    --build-arg ARCH="arm64-v8a" \
+    --build-arg ARCH="x86" \
     --build-arg TARGET="google_apis" \
     --build-arg API_LEVEL="25" \
     --build-arg BUILD_TOOLS="25.0.3" \
     --build-arg EMULATOR_NAME="nexus" \
-    --build-arg EMULATOR_DEVICE="Nexus_5" \
-    -t android7-emulator-nexus:api25-arm .
+    --build-arg EMULATOR_DEVICE="Nexus 5" \
+    -t nexus:android7_x86 .
 
 # Run with VNC
 docker run -it --privileged \

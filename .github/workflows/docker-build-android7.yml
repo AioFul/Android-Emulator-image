@@ -39,11 +39,11 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64
-          tags: ghcr.io/${{ env.GHCR_OWNER }}/roid-pixel:7.1
+          tags: ghcr.io/${{ env.GHCR_OWNER }}/roid-nexus:7.1
           build-args: |
             ARCH=x86
             TARGET=google_apis
             API_LEVEL=25
             BUILD_TOOLS=25.0.3
-            EMULATOR_DEVICE=pixel_3a
-            EMULATOR_NAME=pixel
+            EMULATOR_DEVICE=Nexus 5
+            EMULATOR_NAME=nexus
